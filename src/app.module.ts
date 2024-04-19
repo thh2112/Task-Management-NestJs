@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as _ from 'lodash';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AppService } from './app.service';
       envFilePath: ['.env', '.env.local', '.env.production'],
       load: _.values(configurations),
     }),
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
