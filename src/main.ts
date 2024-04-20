@@ -15,7 +15,7 @@ async function bootstrap() {
   });
 
   const configService = app.get<ConfigService>(ConfigService);
-  // app.useGlobalFilters(new AllExceptionsFilter(configService));
+  app.useGlobalFilters(new AllExceptionsFilter(configService));
   app.useGlobalPipes(
     new ValidationPipe({
       disableErrorMessages: false,
@@ -30,6 +30,9 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(3000);
+  if (process.env.NODE_ENV !== Environment.Production) {
+    await app.listen(configService.get('PORT'));
+    console.log(`✅ Application is 🏃‍♂️ on: ${await app.getUrl()} - ${configService.get('NODE_ENV')}`);
+  }
 }
 bootstrap();
