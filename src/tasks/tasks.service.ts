@@ -1,14 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import * as uuid from 'uuid';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { PrismaService } from '@shared/providers';
+import * as _ from 'lodash';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { FilterTaskDto } from './dtos/filter-task.dto';
-import * as _ from 'lodash';
+import { PatchTaskDto } from './dtos/patch-task.dto';
 @Injectable()
 export class TasksService {
-  private tasks = [];
+  constructor(private prismaService: PrismaService) {}
 
   async getAllTasks() {
-    return this.tasks;
+    try {
+      return await this.prismaService.task.findMany();
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   async getTasksWithFilters(filter: FilterTaskDto) {
@@ -28,26 +33,64 @@ export class TasksService {
   }
 
   async getTaskById(id: string) {
-    const foundTask = this.tasks?.find((t) => t.id === id);
-    if (!foundTask) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
-    }
+    try {
+      const task = await this.prismaService.task.findUnique({
+        where: { id },
+      });
 
-    return foundTask;
+      if (!task) {
+        throw new NotFoundException('Task not found');
+      }
+      return task;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
-  createTask(task: CreateTaskDto) {
-    const { title, description } = task;
-    const taskDto = {
-      id: uuid.v4(),
-      title,
-      description,
-    };
-    this.tasks.push(taskDto);
-    return taskDto;
+  async createTask({ title, description }: CreateTaskDto) {
+    try {
+      const existedTask = await this.prismaService.task.findFirst({
+        where: { title },
+      });
+
+      if (existedTask) {
+        throw new UnprocessableEntityException('Task is existed');
+      }
+
+      const newTask = await this.prismaService.task.create({
+        data: {
+          title,
+          description,
+        },
+      });
+      return newTask;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async patchTask(id: string, { type, value }: PatchTaskDto) {
+    try {
+      await this.getTaskById(id);
+      const result = await this.prismaService.task.update({
+        where: { id },
+        data: {
+          [type]: value,
+        },
+      });
+
+      return result;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   async deleteTask(id: string) {
-    const task = await this.getTaskById(id);
-    return this.tasks?.filter((t) => t.id !== task.id);
+    try {
+      await this.prismaService.task.delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }

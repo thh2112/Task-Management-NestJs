@@ -4,3 +4,9 @@ export enum TaskStatus {
   DONE = 'DONE',
   TESTING = 'TESTING',
 }
+
+export enum TaskField {
+  TITLE = 'title',
+  DESCRIPTION = 'description',
+  STATUS = 'status',
+}
