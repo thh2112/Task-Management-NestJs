@@ -20,11 +20,57 @@ enum TaskStatus {
   TESTING
 }
 
+enum UserRole {
+  SYSTEM_ADMIN
+  USER
+  LEADER
+}
+
+enum Gender {
+  FEMALE
+  MALE
+}
+
 model Task {
   id          String     @id @default(uuid())
-  title       String
+  title       String     @unique
   description String
   status      TaskStatus @default(TO_DO)
 
+  userId String
+  User   User   @relation(fields: [userId], references: [id])
+
+  categoryId String
+  Category   Category @relation(fields: [categoryId], references: [id])
+
   @@map("task")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String    @db.VarChar(100)
+  email     String    @unique @db.VarChar(100)
+  password  String    @db.VarChar(256)
+  phone     String?   @db.VarChar(10)
+  address   String?   @db.VarChar(150)
+  gender    Gender?
+  role      UserRole  @default(USER)
+  loggedAt  DateTime?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdBy Int       @default(0) @map("created_by")
+  updatedBy Int       @default(0) @map("updated_by")
+  deletedAt DateTime?
+  deletedBy Int?      @map("deleted_by")
+  tasks     Task[]
+
+  @@map("user")
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String
+  tasks Task[]
+
+  @@map("category")
 }
