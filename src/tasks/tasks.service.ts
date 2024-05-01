@@ -46,7 +46,7 @@ export class TasksService {
       throw new Error(error);
     }
   }
-  async createTask({ title, description }: CreateTaskDto) {
+  async createTask({ title, description, categoryId, userId }: CreateTaskDto) {
     try {
       const existedTask = await this.prismaService.task.findFirst({
         where: { title },
@@ -60,6 +60,8 @@ export class TasksService {
         data: {
           title,
           description,
+          categoryId,
+          userId,
         },
       });
       return newTask;

@@ -19,7 +19,11 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@shared/*": ["./shared/*"],
-      "@config/*": ["./config/*"]
+      "@config/*": ["./config/*"],
+      "@security/*": ["./security/*"],
+      "@auth/*": ["./auth/*"],
+      "@tasks/*": ["./tasks/*"],
+      "@user/*": ["./user/*"]
     }
   }
 }
