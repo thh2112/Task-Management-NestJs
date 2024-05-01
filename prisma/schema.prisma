@@ -58,11 +58,20 @@ model User {
   loggedAt  DateTime?
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
-  createdBy Int       @default(0) @map("created_by")
-  updatedBy Int       @default(0) @map("updated_by")
+  createdBy String?   @map("created_by")
+  updatedBy String?   @map("updated_by")
   deletedAt DateTime?
-  deletedBy Int?      @map("deleted_by")
+  deletedBy String?   @map("deleted_by")
   tasks     Task[]
+
+  creator User?  @relation("UserCreateUser", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  creates User[] @relation("UserCreateUser")
+
+  updater User?  @relation("UserUpdateUser", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updates User[] @relation("UserUpdateUser")
+
+  deleter User?  @relation("UserDeleteUser", fields: [deletedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  deletes User[] @relation("UserDeleteUser")
 
   @@map("user")
 }

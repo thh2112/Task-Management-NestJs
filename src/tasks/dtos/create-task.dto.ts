@@ -6,4 +6,10 @@ export class CreateTaskDto {
 
   @IsNotEmpty()
   description: string;
+
+  @IsNotEmpty()
+  categoryId: string;
+
+  @IsNotEmpty()
+  userId: string;
 }

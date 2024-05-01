@@ -5,6 +5,7 @@ import { AllExceptionsFilter } from '@shared/filters';
 import { ConfigService } from '@nestjs/config';
 import { Environment } from '@shared/constants/environment';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import { AuthInterceptor } from '@shared/interceptors/auth.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -16,6 +17,7 @@ async function bootstrap() {
 
   const configService = app.get<ConfigService>(ConfigService);
   app.useGlobalFilters(new AllExceptionsFilter(configService));
+  app.useGlobalInterceptors(new AuthInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
       disableErrorMessages: false,
